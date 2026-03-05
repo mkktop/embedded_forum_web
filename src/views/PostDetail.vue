@@ -241,6 +241,9 @@ const loadPost = async () => {
     if (userStore.isLoggedIn) {
       loadPostStatus()
     }
+    
+    // 加载评论列表
+    loadComments(true)
   } catch (error) {
     console.error('加载帖子失败:', error)
     ElMessage.error('加载帖子失败')
