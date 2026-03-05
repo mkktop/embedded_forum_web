@@ -1,6 +1,13 @@
+/**
+ * 路由配置模块
+ * 功能：定义应用路由、路由守卫、权限控制
+ */
 import { createRouter, createWebHistory } from 'vue-router'
-import { authApi } from '@/api'
 
+/**
+ * 路由配置数组
+ * 每个路由包含：路径、名称、组件、元信息
+ */
 const routes = [
   {
     path: '/',
@@ -90,37 +97,55 @@ const routes = [
   }
 ]
 
+/**
+ * 创建路由实例
+ * 使用HTML5 History模式
+ */
 const router = createRouter({
   history: createWebHistory(),
   routes
 })
 
+/**
+ * 全局路由守卫
+ * 功能：设置页面标题、验证登录状态、验证管理员权限
+ * @param {Object} to - 目标路由对象
+ * @param {Object} from - 来源路由对象
+ * @param {Function} next - 放行函数
+ */
 router.beforeEach(async (to, from, next) => {
+  // 设置页面标题
   document.title = `${to.meta.title || '超次元论坛'} - 超次元论坛`
 
+  // 获取登录状态和用户角色
   const token = localStorage.getItem('token')
   const userInfoStr = localStorage.getItem('userInfo')
   let userRole = null
 
+  // 解析用户信息获取角色
   if (userInfoStr) {
     try {
       const userInfo = JSON.parse(userInfoStr)
       userRole = userInfo.role
     } catch (e) {
+      // JSON解析失败，清除无效数据
       localStorage.removeItem('userInfo')
     }
   }
 
+  // 需要登录但未登录，跳转登录页
   if (to.meta.requiresAuth && !token) {
     next({ name: 'Login', query: { redirect: to.fullPath } })
     return
   }
 
+  // 需要管理员权限但非管理员，跳转首页
   if (to.meta.requiresAdmin && userRole !== 'admin') {
     next({ name: 'Home' })
     return
   }
 
+  // 放行
   next()
 })
 
