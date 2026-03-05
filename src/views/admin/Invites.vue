@@ -22,9 +22,14 @@
     <div class="table-container anime-card">
       <el-table :data="inviteCodeList" v-loading="loading" style="width: 100%">
         <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="code" label="邀请码" width="200">
+        <el-table-column prop="code" label="邀请码" min-width="280">
           <template #default="{ row }">
-            <span class="code-text">{{ row.code }}</span>
+            <div class="code-cell">
+              <span class="code-text">{{ row.code }}</span>
+              <el-button size="small" text type="primary" @click="copyCode(row.code)">
+                <el-icon><DocumentCopy /></el-icon>
+              </el-button>
+            </div>
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="100">
@@ -113,7 +118,7 @@
 import { ref, onMounted } from 'vue'
 import { adminApi } from '@/api'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus } from '@element-plus/icons-vue'
+import { Plus, DocumentCopy } from '@element-plus/icons-vue'
 
 // ==================== 状态定义 ====================
 
@@ -231,6 +236,26 @@ const formatTime = (timeStr) => {
   return `${year}-${month}-${day} ${hours}:${minutes}`
 }
 
+/**
+ * 复制邀请码到剪贴板
+ * @param {string} code - 邀请码
+ */
+const copyCode = async (code) => {
+  try {
+    await navigator.clipboard.writeText(code)
+    ElMessage.success('已复制到剪贴板')
+  } catch (error) {
+    // 降级方案
+    const textArea = document.createElement('textarea')
+    textArea.value = code
+    document.body.appendChild(textArea)
+    textArea.select()
+    document.execCommand('copy')
+    document.body.removeChild(textArea)
+    ElMessage.success('已复制到剪贴板')
+  }
+}
+
 // ==================== 生命周期 ====================
 
 onMounted(() => {
@@ -264,12 +289,22 @@ onMounted(() => {
   padding: 20px;
 }
 
+.code-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .code-text {
   font-family: monospace;
+  font-size: 13px;
   color: #00d4ff;
   background: rgba(0, 212, 255, 0.1);
   padding: 4px 8px;
   border-radius: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .status-tag {
