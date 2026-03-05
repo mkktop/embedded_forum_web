@@ -17,12 +17,7 @@
           @keyup.enter="handleSearch"
         >
           <template #prefix>
-            <el-icon><Search /></el-icon>
-          </template>
-          <template #append>
-            <el-button @click="handleSearch">
-              <el-icon><Search /></el-icon>
-            </el-button>
+            <el-icon class="search-icon" @click="handleSearch"><Search /></el-icon>
           </template>
         </el-input>
       </div>
@@ -235,33 +230,38 @@ const handleCommand = (command) => {
   :deep(.el-input__wrapper) {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px 0 0 20px;
+    border-radius: 24px;
     box-shadow: none;
+    padding: 0 16px;
+    height: 40px;
 
     &:hover {
+      background: rgba(255, 255, 255, 0.12);
       border-color: rgba(255, 107, 157, 0.3);
     }
 
     &.is-focus {
       border-color: #ff6b9d;
+      background: rgba(255, 255, 255, 0.12);
     }
   }
 
-  :deep(.el-input-group__append) {
-    background: linear-gradient(135deg, #ff6b9d, #c44eff);
-    border: none;
-    border-radius: 0 20px 20px 0;
-    padding: 0 16px;
+  :deep(.el-input__inner) {
+    color: #fff;
 
-    .el-button {
-      background: transparent;
-      border: none;
-      color: #fff;
-      padding: 0;
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+  }
 
-      &:hover {
-        background: transparent;
-      }
+  .search-icon {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 16px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: #ff6b9d;
     }
   }
 }
