@@ -340,18 +340,42 @@ html, body {
 /** 下拉菜单项样式覆盖 */
 .el-dropdown-menu__item {
   color: rgba(255, 255, 255, 0.8) !important;
+  background: transparent !important;
   border-radius: 8px !important;
   padding: 10px 16px !important;
+  transition: all 0.2s ease !important;
+  list-style: none;
 
-  &:hover {
+  &:hover,
+  &.is-hovering,
+  &.hover,
+  &:focus {
     background: rgba(255, 107, 157, 0.15) !important;
     color: #ff6b9d !important;
+    outline: none !important;
   }
 
   .el-icon {
     color: inherit;
     margin-right: 8px;
   }
+}
+
+/** 下拉菜单分割线 */
+.el-dropdown-menu__item--divided {
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  margin-top: 8px !important;
+  padding-top: 16px !important;
+}
+
+/** 下拉菜单弹出框 */
+.el-popper.is-light {
+  background: rgba(30, 30, 50, 0.98) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.el-popper.is-pure {
+  background: rgba(30, 30, 50, 0.98) !important;
 }
 
 /** 选择器下拉菜单样式覆盖 */
