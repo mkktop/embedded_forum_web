@@ -53,6 +53,9 @@ request.interceptors.request.use(
  */
 request.interceptors.response.use(
   response => {
+    // 打印响应数据用于调试
+    console.log('API响应:', response.config.url, response.data)
+    
     // 请求成功，返回数据
     if (response.data.success) {
       return response.data
@@ -62,6 +65,9 @@ request.interceptors.response.use(
     return Promise.reject(new Error(response.data.message || '请求失败'))
   },
   error => {
+    // 打印错误详情用于调试
+    console.log('API错误:', error.config?.url, error.response?.data)
+    
     // 处理HTTP错误状态码
     if (error.response) {
       switch (error.response.status) {

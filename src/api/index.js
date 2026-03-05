@@ -26,7 +26,7 @@ export const authApi = {
    * @param {string} data.username - 用户名（4-20字符）
    * @param {string} data.password - 密码（6-20字符）
    * @param {string} data.email - 邮箱
-   * @param {string} data.invite_code - 邀请码
+   * @param {string} data.inviteCode - 邀请码
    * @returns {Promise<Object>} 注册结果，包含token和用户信息
    */
   register(data) {
@@ -309,6 +309,18 @@ export const signInApi = {
    */
   exchangeInviteCode() {
     return request.post('/sign-in/points/exchange')
+  },
+
+  /**
+   * 获取我兑换的邀请码列表
+   * @param {Object} params - 查询参数
+   * @param {number} [params.page] - 页码（默认1）
+   * @param {number} [params.pageSize] - 每页数量（默认20）
+   * @param {number} [params.used] - 按状态筛选：0未使用 / 1已使用
+   * @returns {Promise<Object>} 邀请码列表和分页信息
+   */
+  getMyCodes(params) {
+    return request.get('/sign-in/points/codes', { params })
   }
 }
 

@@ -98,9 +98,9 @@
               />
             </el-form-item>
             
-            <el-form-item prop="invite_code">
+            <el-form-item prop="inviteCode">
               <el-input
-                v-model="registerForm.invite_code"
+                v-model="registerForm.inviteCode"
                 placeholder="请输入邀请码"
                 size="large"
                 :prefix-icon="Ticket"
@@ -139,6 +139,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user'
 import { User, Lock, Message, Ticket } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -151,7 +152,7 @@ const registerForm = reactive({
   email: '',
   password: '',
   confirmPassword: '',
-  invite_code: ''
+  inviteCode: ''
 })
 
 const validateUsername = (rule, value, callback) => {
@@ -211,7 +212,7 @@ const registerRules = {
   confirmPassword: [
     { required: true, validator: validateConfirmPassword, trigger: 'blur' }
   ],
-  invite_code: [
+  inviteCode: [
     { required: true, message: '请输入邀请码', trigger: 'blur' }
   ]
 }
@@ -231,23 +232,49 @@ const getParticleStyle = (index) => {
   }
 }
 
+/**
+ * 处理用户注册
+ * 验证表单后提交注册请求
+ */
 const handleRegister = async () => {
   if (!registerFormRef.value) return
   
-  await registerFormRef.value.validate(async (valid) => {
-    if (!valid) return
+  try {
+    // 使用Promise方式验证表单
+    const valid = await registerFormRef.value.validate().catch((error) => {
+      console.log('表单验证失败:', error)
+      return false
+    })
+    
+    if (!valid) {
+      return
+    }
     
     loading.value = true
-    try {
-      const { confirmPassword, ...submitData } = registerForm
-      await userStore.register(submitData)
-      router.push('/')
-    } catch (error) {
-      console.error('注册失败:', error)
-    } finally {
-      loading.value = false
+    
+    // 构建提交数据，排除confirmPassword
+    const submitData = {
+      username: registerForm.username,
+      email: registerForm.email,
+      password: registerForm.password,
+      inviteCode: registerForm.inviteCode
     }
-  })
+    
+    console.log('提交注册数据:', submitData)
+    
+    await userStore.register(submitData)
+    router.push('/')
+  } catch (error) {
+    console.error('注册失败:', error)
+    // 显示后端返回的错误信息
+    if (error.response?.data?.message) {
+      ElMessage.error(error.response.data.message)
+    } else if (error.message) {
+      ElMessage.error(error.message)
+    }
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 

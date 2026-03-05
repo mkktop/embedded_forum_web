@@ -45,15 +45,29 @@ export const useUserStore = defineStore('user', () => {
   /**
    * 初始化用户状态
    * 从本地存储恢复用户信息，用于页面刷新后保持登录状态
+   * 同时从服务器获取最新用户信息
    */
-  const initUser = () => {
+  const initUser = async () => {
     const storedUserInfo = localStorage.getItem('userInfo')
-    if (storedUserInfo) {
+    const storedToken = localStorage.getItem('token')
+    
+    if (storedToken) {
+      token.value = storedToken
+      
+      if (storedUserInfo) {
+        try {
+          userInfo.value = JSON.parse(storedUserInfo)
+        } catch (e) {
+          // JSON解析失败，清除无效数据
+          localStorage.removeItem('userInfo')
+        }
+      }
+      
+      // 从服务器获取最新用户信息
       try {
-        userInfo.value = JSON.parse(storedUserInfo)
+        await fetchUserInfo()
       } catch (e) {
-        // JSON解析失败，清除无效数据
-        localStorage.removeItem('userInfo')
+        console.warn('初始化获取用户信息失败:', e)
       }
     }
   }
@@ -86,6 +100,13 @@ export const useUserStore = defineStore('user', () => {
       userInfo.value = userData
       localStorage.setItem('userInfo', JSON.stringify(userData))
       
+      // 登录成功后获取完整用户信息
+      try {
+        await fetchUserInfo()
+      } catch (e) {
+        console.warn('获取用户详细信息失败:', e)
+      }
+      
       // 显示成功提示
       ElMessage.success('登录成功！欢迎回来~ ✨')
       return res
@@ -100,7 +121,7 @@ export const useUserStore = defineStore('user', () => {
    * @param {string} registerData.username - 用户名（4-20字符）
    * @param {string} registerData.password - 密码（6-20字符）
    * @param {string} registerData.email - 邮箱
-   * @param {string} registerData.invite_code - 邀请码
+   * @param {string} registerData.inviteCode - 邀请码
    * @returns {Promise<Object>} 注册结果
    * @throws {Error} 注册失败时抛出错误
    */

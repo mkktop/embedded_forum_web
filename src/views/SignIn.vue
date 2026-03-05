@@ -47,16 +47,20 @@
         <!-- 签到奖励说明 -->
         <div class="reward-info">
           <div class="reward-item">
-            <span class="reward-label">基础奖励</span>
-            <span class="reward-value">+10 积分</span>
+            <span class="reward-label">每日签到</span>
+            <span class="reward-value">+20 积分</span>
           </div>
           <div class="reward-item">
             <span class="reward-label">连续7天</span>
-            <span class="reward-value">+50 积分</span>
+            <span class="reward-value">额外 +10 积分</span>
+          </div>
+          <div class="reward-item">
+            <span class="reward-label">连续14天</span>
+            <span class="reward-value">额外 +20 积分</span>
           </div>
           <div class="reward-item">
             <span class="reward-label">连续30天</span>
-            <span class="reward-value">+200 积分</span>
+            <span class="reward-value">额外 +50 积分</span>
           </div>
         </div>
       </div>
@@ -87,10 +91,10 @@
         <!-- 兑换邀请码 -->
         <div class="exchange-section">
           <h4 class="section-title">兑换邀请码</h4>
-          <p class="exchange-desc">消耗 <strong>100</strong> 积分兑换一个邀请码</p>
+          <p class="exchange-desc">消耗 <strong>200</strong> 积分兑换一个邀请码</p>
           <el-button
             type="primary"
-            :disabled="(pointsInfo.points || 0) < 100"
+            :disabled="(pointsInfo.points || 0) < 200"
             :loading="exchanging"
             @click="handleExchange"
           >
@@ -104,8 +108,8 @@
           <div class="code-list">
             <div v-for="code in myInviteCodes" :key="code.id" class="code-item">
               <span class="code-value">{{ code.code }}</span>
-              <span class="code-status" :class="{ used: code.is_used }">
-                {{ code.is_used ? '已使用' : '未使用' }}
+              <span class="code-status" :class="{ used: code.used }">
+                {{ code.used ? '已使用' : '未使用' }}
               </span>
             </div>
           </div>
@@ -227,9 +231,12 @@ const earnedPoints = ref(0)
 const loadSignInStatus = async () => {
   try {
     const res = await signInApi.getStatus()
+    console.log('签到状态响应:', res.data)
     if (res.data) {
-      signInStatus.today_signed = res.data.today_signed || false
-      signInStatus.consecutive_days = res.data.consecutive_days || 0
+      // API返回: has_signed_today, current_continuous_days
+      // 前端使用: today_signed, consecutive_days
+      signInStatus.today_signed = res.data.has_signed_today || false
+      signInStatus.consecutive_days = res.data.current_continuous_days || 0
       signInStatus.total_days = res.data.total_days || 0
     }
   } catch (error) {
@@ -278,25 +285,24 @@ const loadSignInRecords = async () => {
 
 /**
  * 加载我的邀请码
- * 从本地存储读取用户兑换的邀请码
+ * 从API获取用户兑换的邀请码列表
  */
-const loadMyInviteCodes = () => {
+const loadMyInviteCodes = async () => {
   try {
-    const storedCodes = localStorage.getItem('myInviteCodes')
-    if (storedCodes) {
-      myInviteCodes.value = JSON.parse(storedCodes)
+    const res = await signInApi.getMyCodes({})
+    console.log('我的邀请码响应:', res)
+    // 处理不同的数据结构
+    if (res.data?.list) {
+      myInviteCodes.value = res.data.list
+    } else if (Array.isArray(res.data)) {
+      myInviteCodes.value = res.data
+    } else {
+      myInviteCodes.value = []
     }
   } catch (error) {
     console.error('加载邀请码失败:', error)
     myInviteCodes.value = []
   }
-}
-
-/**
- * 保存邀请码到本地存储
- */
-const saveMyInviteCodes = () => {
-  localStorage.setItem('myInviteCodes', JSON.stringify(myInviteCodes.value))
 }
 
 // ==================== 事件处理方法 ====================
@@ -308,11 +314,12 @@ const handleSignIn = async () => {
   signingIn.value = true
   try {
     const res = await signInApi.signIn()
-    earnedPoints.value = res.data?.points_earned || 10
+    console.log('签到响应:', res.data)
+    earnedPoints.value = res.data?.points_earned || 20
     
-    // 更新签到状态
+    // 更新签到状态 - API返回continuous_days
     signInStatus.today_signed = true
-    signInStatus.consecutive_days = (signInStatus.consecutive_days || 0) + 1
+    signInStatus.consecutive_days = res.data?.continuous_days || (signInStatus.consecutive_days + 1)
     
     // 更新积分
     pointsInfo.points = (pointsInfo.points || 0) + earnedPoints.value
@@ -336,8 +343,8 @@ const handleSignIn = async () => {
  * 兑换邀请码
  */
 const handleExchange = async () => {
-  if ((pointsInfo.points || 0) < 100) {
-    ElMessage.warning('积分不足，需要100积分')
+  if ((pointsInfo.points || 0) < 200) {
+    ElMessage.warning('积分不足，需要200积分')
     return
   }
   
@@ -347,18 +354,10 @@ const handleExchange = async () => {
     ElMessage.success('兑换成功！获得邀请码：' + res.data?.code)
     
     // 更新积分
-    pointsInfo.points = (pointsInfo.points || 0) - 100
+    pointsInfo.points = (pointsInfo.points || 0) - 200
     
-    // 添加到邀请码列表并保存到本地存储
-    if (res.data) {
-      myInviteCodes.value.unshift({
-        id: Date.now(),
-        code: res.data.code,
-        is_used: false,
-        created_at: new Date().toISOString()
-      })
-      saveMyInviteCodes()
-    }
+    // 刷新邀请码列表
+    loadMyInviteCodes()
   } catch (error) {
     console.error('兑换失败:', error)
   } finally {
