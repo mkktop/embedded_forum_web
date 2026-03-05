@@ -108,8 +108,8 @@
           <div class="code-list">
             <div v-for="code in myInviteCodes" :key="code.id" class="code-item">
               <span class="code-value">{{ code.code }}</span>
-              <span class="code-status" :class="{ used: code.used }">
-                {{ code.used ? '已使用' : '未使用' }}
+              <span class="code-status" :class="{ used: code.used === 1 || code.used === true }">
+                {{ (code.used === 1 || code.used === true) ? '已使用' : '未使用' }}
               </span>
             </div>
           </div>

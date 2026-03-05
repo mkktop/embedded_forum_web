@@ -29,17 +29,19 @@
           </template>
         </el-table-column>
         <el-table-column prop="sort_order" label="排序" width="80" />
-        <el-table-column label="操作" width="180" fixed="right">
+        <el-table-column label="操作" width="240" fixed="right">
           <template #default="{ row }">
-            <el-button size="small" @click="handleEdit(row)">编辑</el-button>
-            <el-button
-              size="small"
-              :type="row.status === 1 ? 'warning' : 'success'"
-              @click="handleToggleStatus(row)"
-            >
-              {{ row.status === 1 ? '禁用' : '启用' }}
-            </el-button>
-            <el-button size="small" type="danger" @click="handleDelete(row)">删除</el-button>
+            <div class="action-buttons">
+              <el-button size="small" @click="handleEdit(row)">编辑</el-button>
+              <el-button
+                size="small"
+                :type="row.status === 1 ? 'warning' : 'success'"
+                @click="handleToggleStatus(row)"
+              >
+                {{ row.status === 1 ? '禁用' : '启用' }}
+              </el-button>
+              <el-button size="small" type="danger" @click="handleDelete(row)">删除</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -263,6 +265,12 @@ onMounted(() => {
 
 .table-container {
   padding: 20px;
+}
+
+.action-buttons {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
 }
 
 .status-tag {

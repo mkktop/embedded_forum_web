@@ -29,8 +29,8 @@
         </el-table-column>
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
-            <span class="status-tag" :class="{ used: row.is_used }">
-              {{ row.is_used ? '已使用' : '未使用' }}
+            <span class="status-tag" :class="{ used: row.used === 1 || row.used === true }">
+              {{ (row.used === 1 || row.used === true) ? '已使用' : '未使用' }}
             </span>
           </template>
         </el-table-column>
@@ -57,7 +57,7 @@
         <el-table-column label="操作" width="100" fixed="right">
           <template #default="{ row }">
             <el-button
-              v-if="!row.is_used"
+              v-if="row.used !== 1 && row.used !== true"
               size="small"
               type="danger"
               @click="handleDelete(row)"
@@ -157,9 +157,11 @@ const loadInviteCodes = async () => {
       pageSize: pageSize.value
     }
     
-    if (filterStatus.value !== '') params.is_used = filterStatus.value
+    // API参数使用used，不是is_used
+    if (filterStatus.value !== '') params.used = filterStatus.value
     
     const res = await adminApi.getInviteCodes(params)
+    console.log('邀请码列表响应:', res.data)
     inviteCodeList.value = res.data?.list || res.data || []
     total.value = res.data?.pagination?.total || res.data?.total || 0
   } catch (error) {

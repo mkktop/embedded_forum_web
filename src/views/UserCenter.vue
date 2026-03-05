@@ -17,6 +17,10 @@
           <el-icon><Edit /></el-icon>
           编辑资料
         </el-button>
+        <el-button @click="showPasswordDialog = true">
+          <el-icon><Key /></el-icon>
+          修改密码
+        </el-button>
       </div>
       
       <!-- 用户统计 -->
@@ -145,6 +149,60 @@
             <p>暂无点赞</p>
           </div>
         </el-tab-pane>
+
+        <!-- 我的兑换记录 -->
+        <el-tab-pane label="兑换记录" name="purchases">
+          <div v-if="loadingPurchases" class="loading-state">
+            <el-icon class="loading-icon"><Loading /></el-icon>
+            <span>加载中...</span>
+          </div>
+          <div v-else-if="myPurchases.length > 0" class="purchase-list">
+            <div v-for="item in myPurchases" :key="item.id" class="purchase-item" @click="goToPost(item.post_id)">
+              <div class="purchase-info">
+                <h4 class="purchase-title">{{ item.post_title }}</h4>
+                <p class="purchase-meta">
+                  <span>消耗 {{ item.points_cost }} 积分</span>
+                  <span>{{ formatTime(item.create_time) }}</span>
+                </p>
+              </div>
+              <div class="purchase-link">
+                <el-button size="small" type="primary" @click.stop="openDownloadLink(item.download_link)">
+                  下载资源
+                </el-button>
+              </div>
+            </div>
+          </div>
+          <div v-else class="empty-state">
+            <el-icon><Download /></el-icon>
+            <p>暂无兑换记录</p>
+          </div>
+        </el-tab-pane>
+
+        <!-- 我的资源收益 -->
+        <el-tab-pane label="资源收益" name="earnings">
+          <div v-if="loadingEarnings" class="loading-state">
+            <el-icon class="loading-icon"><Loading /></el-icon>
+            <span>加载中...</span>
+          </div>
+          <div v-else-if="myEarnings.length > 0" class="earnings-list">
+            <div v-for="item in myEarnings" :key="item.id" class="earnings-item">
+              <div class="earnings-info">
+                <h4 class="earnings-title">{{ item.post_title }}</h4>
+                <p class="earnings-meta">
+                  <span>购买者: {{ item.buyer_name }}</span>
+                  <span>{{ formatTime(item.create_time) }}</span>
+                </p>
+              </div>
+              <div class="earnings-amount">
+                +{{ item.earnings }} 积分
+              </div>
+            </div>
+          </div>
+          <div v-else class="empty-state">
+            <el-icon><Coin /></el-icon>
+            <p>暂无收益记录</p>
+          </div>
+        </el-tab-pane>
       </el-tabs>
     </div>
 
@@ -175,6 +233,45 @@
         <el-button type="primary" :loading="savingProfile" @click="saveProfile">保存</el-button>
       </template>
     </el-dialog>
+
+    <!-- 修改密码对话框 -->
+    <el-dialog
+      v-model="showPasswordDialog"
+      title="修改密码"
+      width="400px"
+      :close-on-click-modal="false"
+    >
+      <el-form :model="passwordForm" label-position="top">
+        <el-form-item label="原密码" required>
+          <el-input
+            v-model="passwordForm.old_password"
+            type="password"
+            placeholder="请输入原密码"
+            show-password
+          />
+        </el-form-item>
+        <el-form-item label="新密码" required>
+          <el-input
+            v-model="passwordForm.new_password"
+            type="password"
+            placeholder="请输入新密码（6-20字符）"
+            show-password
+          />
+        </el-form-item>
+        <el-form-item label="确认新密码" required>
+          <el-input
+            v-model="passwordForm.confirm_password"
+            type="password"
+            placeholder="请再次输入新密码"
+            show-password
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="showPasswordDialog = false">取消</el-button>
+        <el-button type="primary" :loading="savingPassword" @click="changePassword">确认修改</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -190,12 +287,15 @@ import { postApi, commentApi, userApi, authApi } from '@/api'
 import { ElMessage } from 'element-plus'
 import {
   Edit,
+  Key,
   Loading,
   Document,
   ChatDotRound,
   Star,
   CollectionTag,
-  View
+  View,
+  Download,
+  Coin
 } from '@element-plus/icons-vue'
 
 // ==================== 状态定义 ====================
@@ -215,6 +315,8 @@ const loadingPosts = ref(false)
 const loadingComments = ref(false)
 const loadingFavorites = ref(false)
 const loadingLikes = ref(false)
+const loadingPurchases = ref(false)
+const loadingEarnings = ref(false)
 
 /** 我的帖子列表 */
 const myPosts = ref([])
@@ -228,14 +330,31 @@ const myFavorites = ref([])
 /** 我的点赞列表 */
 const myLikes = ref([])
 
+/** 我的兑换记录列表 */
+const myPurchases = ref([])
+
+/** 我的资源收益列表 */
+const myEarnings = ref([])
+
 /** 编辑资料对话框 */
 const showEditDialog = ref(false)
 const savingProfile = ref(false)
+
+/** 修改密码对话框 */
+const showPasswordDialog = ref(false)
+const savingPassword = ref(false)
 
 /** 编辑表单数据 */
 const editForm = reactive({
   nickname: '',
   signature: ''
+})
+
+/** 修改密码表单数据 */
+const passwordForm = reactive({
+  old_password: '',
+  new_password: '',
+  confirm_password: ''
 })
 
 // ==================== 数据加载方法 ====================
@@ -345,6 +464,56 @@ const loadMyLikes = async () => {
 }
 
 /**
+ * 加载我的兑换记录
+ */
+const loadMyPurchases = async () => {
+  loadingPurchases.value = true
+  try {
+    const res = await userApi.getPurchases()
+    console.log('兑换记录响应:', res)
+    if (Array.isArray(res.data)) {
+      myPurchases.value = res.data
+    } else if (res.data?.list) {
+      myPurchases.value = res.data.list
+    } else if (res.data?.purchases) {
+      myPurchases.value = res.data.purchases
+    } else {
+      myPurchases.value = []
+    }
+  } catch (error) {
+    console.error('加载兑换记录失败:', error)
+    myPurchases.value = []
+  } finally {
+    loadingPurchases.value = false
+  }
+}
+
+/**
+ * 加载我的资源收益
+ */
+const loadMyEarnings = async () => {
+  loadingEarnings.value = true
+  try {
+    const res = await userApi.getEarnings()
+    console.log('资源收益响应:', res)
+    if (Array.isArray(res.data)) {
+      myEarnings.value = res.data
+    } else if (res.data?.list) {
+      myEarnings.value = res.data.list
+    } else if (res.data?.earnings) {
+      myEarnings.value = res.data.earnings
+    } else {
+      myEarnings.value = []
+    }
+  } catch (error) {
+    console.error('加载资源收益失败:', error)
+    myEarnings.value = []
+  } finally {
+    loadingEarnings.value = false
+  }
+}
+
+/**
  * 刷新用户信息
  */
 const refreshUserInfo = async () => {
@@ -374,6 +543,12 @@ const handleTabChange = (tab) => {
       break
     case 'likes':
       if (myLikes.value.length === 0) loadMyLikes()
+      break
+    case 'purchases':
+      if (myPurchases.value.length === 0) loadMyPurchases()
+      break
+    case 'earnings':
+      if (myEarnings.value.length === 0) loadMyEarnings()
       break
   }
 }
@@ -409,6 +584,67 @@ const saveProfile = async () => {
     console.error('保存失败:', error)
   } finally {
     savingProfile.value = false
+  }
+}
+
+/**
+ * 修改密码
+ */
+const changePassword = async () => {
+  // 验证表单
+  if (!passwordForm.old_password) {
+    ElMessage.warning('请输入原密码')
+    return
+  }
+  if (!passwordForm.new_password) {
+    ElMessage.warning('请输入新密码')
+    return
+  }
+  if (passwordForm.new_password.length < 6 || passwordForm.new_password.length > 20) {
+    ElMessage.warning('新密码长度为6-20个字符')
+    return
+  }
+  if (passwordForm.new_password !== passwordForm.confirm_password) {
+    ElMessage.warning('两次输入的新密码不一致')
+    return
+  }
+  
+  savingPassword.value = true
+  try {
+    await authApi.changePassword({
+      old_password: passwordForm.old_password,
+      new_password: passwordForm.new_password
+    })
+    
+    ElMessage.success('密码修改成功，请重新登录')
+    showPasswordDialog.value = false
+    
+    // 重置表单
+    passwordForm.old_password = ''
+    passwordForm.new_password = ''
+    passwordForm.confirm_password = ''
+    
+    // 退出登录
+    setTimeout(() => {
+      userStore.logout()
+      router.push('/login')
+    }, 1500)
+  } catch (error) {
+    console.error('修改密码失败:', error)
+  } finally {
+    savingPassword.value = false
+  }
+}
+
+/**
+ * 打开下载链接
+ * @param {string} url - 下载链接
+ */
+const openDownloadLink = (url) => {
+  if (url) {
+    window.open(url, '_blank')
+  } else {
+    ElMessage.warning('下载链接不可用')
   }
 }
 
@@ -455,7 +691,7 @@ watch(showEditDialog, (val) => {
 watch(
   () => route.query.tab,
   (tab) => {
-    if (tab && ['posts', 'comments', 'favorites', 'likes'].includes(tab)) {
+    if (tab && ['posts', 'comments', 'favorites', 'likes', 'purchases', 'earnings'].includes(tab)) {
       activeTab.value = tab
       handleTabChange(tab)
     }
@@ -717,6 +953,65 @@ onMounted(() => {
     font-size: 48px;
     margin-bottom: 16px;
   }
+}
+
+.purchase-list,
+.earnings-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.purchase-item,
+.earnings-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: background 0.3s ease;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.03);
+    margin: 0 -16px;
+    padding: 16px;
+    border-radius: 10px;
+  }
+}
+
+.purchase-info,
+.earnings-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.purchase-title,
+.earnings-title {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.purchase-meta,
+.earnings-meta {
+  display: flex;
+  gap: 16px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+}
+
+.earnings-amount {
+  color: #00d4ff;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 :deep(.el-dialog) {

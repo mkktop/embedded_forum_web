@@ -38,6 +38,8 @@ html, body {
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   min-height: 100vh;
   color: #e0e0e0;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 // ==================== 滚动条样式 ====================
