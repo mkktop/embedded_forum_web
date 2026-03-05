@@ -86,6 +86,7 @@
         <li>标题请简明扼要，准确描述帖子主题</li>
         <li>内容请遵守社区规范，文明发言</li>
         <li>禁止发布违法、违规、广告等内容</li>
+        <li class="warning">严禁发布政治相关内容</li>
         <li>发帖可获得积分奖励</li>
       </ul>
     </div>
@@ -347,6 +348,16 @@ onMounted(() => {
       position: absolute;
       left: 0;
       color: #ff6b9d;
+    }
+
+    &.warning {
+      color: #ff6b9d;
+      font-weight: 500;
+
+      &::before {
+        content: '⚠';
+        color: #ff6b9d;
+      }
     }
   }
 }

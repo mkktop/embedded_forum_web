@@ -363,13 +363,37 @@ html, body {
 
 .el-select-dropdown__item {
   color: rgba(255, 255, 255, 0.8) !important;
+  background: transparent !important;
 
-  &:hover {
+  &:hover,
+  &.hover,
+  &.is-hovering {
     background: rgba(255, 107, 157, 0.15) !important;
+    color: #ff6b9d !important;
   }
 
-  &.selected {
+  &.selected,
+  &.is-selected {
     color: #ff6b9d !important;
+    background: rgba(255, 107, 157, 0.1) !important;
+    font-weight: 500;
+  }
+}
+
+.el-select-dropdown__list {
+  padding: 4px !important;
+}
+
+/** 选择器弹出框样式覆盖 */
+.el-select__popper {
+  background: rgba(30, 30, 50, 0.98) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/** 选择器包装器悬浮状态 */
+.el-select .el-select__wrapper {
+  &:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
   }
 }
 

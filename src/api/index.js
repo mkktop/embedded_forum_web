@@ -249,6 +249,14 @@ export const commentApi = {
  */
 export const categoryApi = {
   /**
+   * 获取所有版块列表（管理员）
+   * @returns {Promise<Object>} 所有版块列表（包含禁用状态）
+   */
+  getAll() {
+    return request.get('/categories')
+  },
+
+  /**
    * 获取启用的版块列表
    * @returns {Promise<Object>} 版块列表
    */

@@ -123,11 +123,12 @@ const categoryForm = reactive({
 const loadCategories = async () => {
   loading.value = true
   try {
-    const res = await adminApi.getInviteCodes ? await adminApi.getInviteCodes() : { data: [] }
-    // 使用 categoryApi 获取版块列表
     const { categoryApi } = await import('@/api')
-    const catRes = await categoryApi.getActive()
-    categoryList.value = catRes.data || []
+    // 使用 getAll 获取所有版块（包含禁用状态）
+    const catRes = await categoryApi.getAll()
+    console.log('版块列表响应:', catRes)
+    // API返回 { list: [...], pagination: {...} }
+    categoryList.value = catRes.data?.list || catRes.data || []
   } catch (error) {
     console.error('加载版块失败:', error)
     ElMessage.error('加载版块失败')
@@ -156,12 +157,13 @@ const handleEdit = (category) => {
  */
 const handleToggleStatus = async (category) => {
   const newStatus = category.status === 1 ? 0 : 1
-  const action = newStatus ? '启用' : '禁用'
+  const action = newStatus === 1 ? '启用' : '禁用'
   
   try {
     await adminApi.updateCategory(category.id, { status: newStatus })
     ElMessage.success(`${action}成功`)
-    category.status = newStatus
+    // 重新加载列表以获取最新数据
+    loadCategories()
   } catch (error) {
     console.error('操作失败:', error)
   }
