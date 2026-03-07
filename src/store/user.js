@@ -136,15 +136,22 @@ export const useUserStore = defineStore('user', () => {
       // 构建用户数据对象（注册返回的信息较少）
       const userData = {
         id: res.data.id,
-        username: res.data.username
+        username: res.data.username,
+        nickname: res.data.nickname || res.data.username,
+        role: res.data.role || 'user'
       }
       
       // 保存用户信息到状态和本地存储
       userInfo.value = userData
       localStorage.setItem('userInfo', JSON.stringify(userData))
       
-      // 显示成功提示
-      ElMessage.success('注册成功！欢迎加入超次元论坛~ 🎉')
+      // 注册成功后获取完整用户信息
+      try {
+        await fetchUserInfo()
+      } catch (e) {
+        console.warn('获取用户详细信息失败:', e)
+      }
+      
       return res
     } catch (error) {
       throw error

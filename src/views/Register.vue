@@ -263,7 +263,17 @@ const handleRegister = async () => {
     console.log('提交注册数据:', submitData)
     
     await userStore.register(submitData)
-    router.push('/')
+    
+    // 显示成功提示
+    ElMessage.success({
+      message: '注册成功！3秒后自动跳转首页...',
+      duration: 3000
+    })
+    
+    // 3秒后跳转到首页
+    setTimeout(() => {
+      router.push('/')
+    }, 3000)
   } catch (error) {
     console.error('注册失败:', error)
     // 显示后端返回的错误信息
