@@ -337,7 +337,21 @@ const handleSearch = () => {
 const handleViewDetail = async (user) => {
   try {
     const res = await adminApi.getUserDetail(user.id)
-    currentUser.value = res.data
+    console.log('用户详情响应:', res.data)
+    
+    // API返回嵌套结构：user, profile, auth, stats
+    const data = res.data
+    currentUser.value = {
+      ...data.user,
+      signature: data.profile?.signature,
+      gender: data.profile?.gender,
+      birthday: data.profile?.birthday,
+      points: data.auth?.points,
+      download_limit: data.auth?.download_limit,
+      post_count: data.stats?.post_count?.total || 0,
+      comment_count: data.stats?.comment_count || 0
+    }
+    
     detailDialogVisible.value = true
   } catch (error) {
     console.error('获取详情失败:', error)
