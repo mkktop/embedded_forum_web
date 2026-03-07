@@ -285,6 +285,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user'
 import { postApi, commentApi, userApi, authApi } from '@/api'
 import { ElMessage } from 'element-plus'
+import { formatTime } from '@/utils/time'
 import {
   Edit,
   Key,
@@ -646,31 +647,6 @@ const openDownloadLink = (url) => {
   } else {
     ElMessage.warning('下载链接不可用')
   }
-}
-
-// ==================== 工具方法 ====================
-
-/**
- * 格式化时间
- * @param {string} timeStr - ISO时间字符串
- * @returns {string} 格式化后的时间
- */
-const formatTime = (timeStr) => {
-  if (!timeStr) return ''
-  const date = new Date(timeStr)
-  const now = new Date()
-  const diff = now - date
-  
-  if (diff < 60 * 1000) return '刚刚'
-  if (diff < 60 * 60 * 1000) return `${Math.floor(diff / (60 * 1000))}分钟前`
-  if (diff < 24 * 60 * 60 * 1000) return `${Math.floor(diff / (60 * 60 * 1000))}小时前`
-  if (diff < 7 * 24 * 60 * 60 * 1000) return `${Math.floor(diff / (24 * 60 * 60 * 1000))}天前`
-  
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  
-  return year === now.getFullYear() ? `${month}-${day}` : `${year}-${month}-${day}`
 }
 
 // ==================== 监听器 ====================

@@ -51,12 +51,12 @@
         </el-table-column>
         <el-table-column prop="create_time" label="创建时间" width="160">
           <template #default="{ row }">
-            {{ formatTime(row.create_time) }}
+            {{ formatTime(row.create_time, { relative: false }) }}
           </template>
         </el-table-column>
         <el-table-column prop="used_at" label="使用时间" width="160">
           <template #default="{ row }">
-            {{ row.used_at ? formatTime(row.used_at) : '-' }}
+            {{ row.used_at ? formatTime(row.used_at, { relative: false }) : '-' }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="100" fixed="right">
@@ -119,6 +119,7 @@ import { ref, onMounted } from 'vue'
 import { adminApi } from '@/api'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, DocumentCopy } from '@element-plus/icons-vue'
+import { formatTime } from '@/utils/time'
 
 // ==================== 状态定义 ====================
 
@@ -219,22 +220,6 @@ const handleDelete = async (code) => {
 }
 
 // ==================== 工具方法 ====================
-
-/**
- * 格式化时间
- * @param {string} timeStr - ISO时间字符串
- * @returns {string} 格式化后的时间
- */
-const formatTime = (timeStr) => {
-  if (!timeStr) return '-'
-  const date = new Date(timeStr)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  return `${year}-${month}-${day} ${hours}:${minutes}`
-}
 
 /**
  * 复制邀请码到剪贴板

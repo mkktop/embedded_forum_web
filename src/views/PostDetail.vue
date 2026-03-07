@@ -41,7 +41,7 @@
                   {{ post.author_nickname || post.author_name }}
                 </router-link>
                 <span class="author-id">ID: {{ post.user_id }}</span>
-                <span class="post-time">{{ formatTime(post.create_time) }}</span>
+                <span class="post-time">{{ formatTime(post.create_time, { relative: false }) }}</span>
               </div>
             </div>
             <div class="post-stats">
@@ -177,6 +177,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user'
 import { postApi, commentApi } from '@/api'
 import { ElMessage } from 'element-plus'
+import { formatTime } from '@/utils/time'
 import {
   Loading,
   Top,
@@ -427,22 +428,6 @@ const submitReply = async () => {
 }
 
 // ==================== 工具方法 ====================
-
-/**
- * 格式化时间
- * @param {string} timeStr - ISO时间字符串
- * @returns {string} 格式化后的时间
- */
-const formatTime = (timeStr) => {
-  if (!timeStr) return ''
-  const date = new Date(timeStr)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  return `${year}-${month}-${day} ${hours}:${minutes}`
-}
 
 /**
  * 格式化帖子内容

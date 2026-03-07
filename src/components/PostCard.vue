@@ -65,6 +65,7 @@
  * 帖子卡片组件
  * 功能：展示帖子摘要信息，包括标题、摘要、作者、统计数据
  */
+import { formatTime } from '@/utils/time'
 
 // ==================== Props定义 ====================
 
@@ -78,53 +79,6 @@ defineProps({
     required: true
   }
 })
-
-// ==================== 方法定义 ====================
-
-/**
- * 格式化时间显示
- * @param {string} timeStr - ISO时间字符串
- * @returns {string} 格式化后的时间显示
- */
-const formatTime = (timeStr) => {
-  if (!timeStr) return ''
-  
-  const date = new Date(timeStr)
-  const now = new Date()
-  const diff = now - date
-  
-  // 一分钟内
-  if (diff < 60 * 1000) {
-    return '刚刚'
-  }
-  
-  // 一小时内
-  if (diff < 60 * 60 * 1000) {
-    return `${Math.floor(diff / (60 * 1000))}分钟前`
-  }
-  
-  // 一天内
-  if (diff < 24 * 60 * 60 * 1000) {
-    return `${Math.floor(diff / (60 * 60 * 1000))}小时前`
-  }
-  
-  // 一周内
-  if (diff < 7 * 24 * 60 * 60 * 1000) {
-    return `${Math.floor(diff / (24 * 60 * 60 * 1000))}天前`
-  }
-  
-  // 超过一周显示日期
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  
-  // 同一年不显示年份
-  if (year === now.getFullYear()) {
-    return `${month}-${day}`
-  }
-  
-  return `${year}-${month}-${day}`
-}
 </script>
 
 <style lang="scss" scoped>

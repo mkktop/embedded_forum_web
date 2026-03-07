@@ -42,7 +42,7 @@
 
         <div class="user-meta">
           <p><span class="meta-label">用户名：</span>{{ userInfo.username }}</p>
-          <p><span class="meta-label">注册时间：</span>{{ formatTime(userInfo.create_time) }}</p>
+          <p><span class="meta-label">注册时间：</span>{{ formatTime(userInfo.create_time, { relative: false }) }}</p>
         </div>
       </div>
 
@@ -93,6 +93,7 @@ import { userPublicApi } from '@/api'
 import { ElMessage } from 'element-plus'
 import { Document, Loading, User } from '@element-plus/icons-vue'
 import PostCard from '@/components/PostCard.vue'
+import { formatTime } from '@/utils/time'
 
 const route = useRoute()
 
@@ -152,17 +153,6 @@ const handlePageChange = (page) => {
   currentPage.value = page
   loadUserPosts()
   window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-const formatTime = (timeStr) => {
-  if (!timeStr) return '-'
-  const date = new Date(timeStr)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  return `${year}-${month}-${day} ${hours}:${minutes}`
 }
 
 watch(() => route.params.id, (newId) => {

@@ -72,7 +72,7 @@
         <el-table-column prop="points" label="积分" width="100" />
         <el-table-column prop="create_time" label="注册时间" width="160">
           <template #default="{ row }">
-            {{ formatTime(row.create_time) }}
+            {{ formatTime(row.create_time, { relative: false }) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="280" fixed="right">
@@ -167,7 +167,7 @@
         </div>
         <div class="detail-item">
           <span class="detail-label">注册时间</span>
-          <span class="detail-value">{{ formatTime(currentUser.create_time) }}</span>
+          <span class="detail-value">{{ formatTime(currentUser.create_time, { relative: false }) }}</span>
         </div>
         <div class="detail-item">
           <span class="detail-label">个性签名</span>
@@ -193,6 +193,7 @@ import { adminApi } from '@/api'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
+import { formatTime } from '@/utils/time'
 
 // ==================== 状态定义 ====================
 
@@ -426,24 +427,6 @@ const handleToggleRole = async (user) => {
       console.error('操作失败:', error)
     }
   }
-}
-
-// ==================== 工具方法 ====================
-
-/**
- * 格式化时间
- * @param {string} timeStr - ISO时间字符串
- * @returns {string} 格式化后的时间
- */
-const formatTime = (timeStr) => {
-  if (!timeStr) return '-'
-  const date = new Date(timeStr)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  return `${year}-${month}-${day} ${hours}:${minutes}`
 }
 
 // ==================== 生命周期 ====================

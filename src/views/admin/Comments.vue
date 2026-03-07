@@ -52,7 +52,7 @@
         </el-table-column>
         <el-table-column prop="create_time" label="评论时间" width="160">
           <template #default="{ row }">
-            {{ formatTime(row.create_time) }}
+            {{ formatTime(row.create_time, { relative: false }) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="100" fixed="right">
@@ -90,6 +90,7 @@ import { useRouter } from 'vue-router'
 import { adminApi } from '@/api'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
+import { formatTime } from '@/utils/time'
 
 // ==================== 状态定义 ====================
 
@@ -178,24 +179,6 @@ const handleDelete = async (comment) => {
       console.error('删除失败:', error)
     }
   }
-}
-
-// ==================== 工具方法 ====================
-
-/**
- * 格式化时间
- * @param {string} timeStr - ISO时间字符串
- * @returns {string} 格式化后的时间
- */
-const formatTime = (timeStr) => {
-  if (!timeStr) return '-'
-  const date = new Date(timeStr)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  return `${year}-${month}-${day} ${hours}:${minutes}`
 }
 
 // ==================== 生命周期 ====================
