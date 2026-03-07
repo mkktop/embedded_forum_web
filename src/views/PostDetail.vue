@@ -31,11 +31,16 @@
           <!-- 作者信息 -->
           <div class="post-meta">
             <div class="author-info">
-              <el-avatar :size="40" class="author-avatar">
-                {{ post.author_name?.charAt(0) || 'U' }}
-              </el-avatar>
+              <router-link :to="`/user/${post.author_id}`" class="author-avatar-link">
+                <el-avatar :size="40" class="author-avatar">
+                  {{ post.author_name?.charAt(0) || 'U' }}
+                </el-avatar>
+              </router-link>
               <div class="author-detail">
-                <span class="author-name">{{ post.author_nickname || post.author_name }}</span>
+                <router-link :to="`/user/${post.author_id}`" class="author-name">
+                  {{ post.author_nickname || post.author_name }}
+                </router-link>
+                <span class="author-id">ID: {{ post.author_id }}</span>
                 <span class="post-time">{{ formatTime(post.create_time) }}</span>
               </div>
             </div>
@@ -564,20 +569,42 @@ onMounted(() => {
   gap: 12px;
 }
 
+.author-avatar-link {
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
 .author-avatar {
   background: linear-gradient(135deg, #ff6b9d, #c44eff);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
 }
 
 .author-detail {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .author-name {
   color: #fff;
   font-size: 16px;
   font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #ff6b9d;
+  }
+}
+
+.author-id {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
 }
 
 .post-time {

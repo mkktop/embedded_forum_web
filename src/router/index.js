@@ -46,6 +46,12 @@ const routes = [
     meta: { title: '个人中心', requiresAuth: true }
   },
   {
+    path: '/user/:id',
+    name: 'UserProfile',
+    component: () => import('@/views/UserProfile.vue'),
+    meta: { title: '用户主页' }
+  },
+  {
     path: '/signin',
     name: 'SignIn',
     component: () => import('@/views/SignIn.vue'),

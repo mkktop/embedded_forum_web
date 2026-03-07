@@ -27,10 +27,17 @@
     <div class="post-footer">
       <!-- 作者信息 -->
       <div class="author-info">
-        <el-avatar :size="28" class="author-avatar">
-          {{ post.author_name?.charAt(0) || 'U' }}
-        </el-avatar>
-        <span class="author-name">{{ post.author_nickname || post.author_name }}</span>
+        <router-link :to="`/user/${post.author_id}`" class="author-avatar-link" @click.prevent.stop>
+          <el-avatar :size="28" class="author-avatar">
+            {{ post.author_name?.charAt(0) || 'U' }}
+          </el-avatar>
+        </router-link>
+        <div class="author-detail">
+          <router-link :to="`/user/${post.author_id}`" class="author-name" @click.prevent.stop>
+            {{ post.author_nickname || post.author_name }}
+          </router-link>
+          <span class="author-id">ID: {{ post.author_id }}</span>
+        </div>
         <span class="post-time">{{ formatTime(post.create_time) }}</span>
       </div>
 
@@ -208,14 +215,42 @@ const formatTime = (timeStr) => {
   gap: 10px;
 }
 
+.author-avatar-link {
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
 .author-avatar {
   background: linear-gradient(135deg, #ff6b9d, #c44eff);
   font-size: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+.author-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .author-name {
   color: rgba(255, 255, 255, 0.8);
   font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #ff6b9d;
+  }
+}
+
+.author-id {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
 }
 
 .post-time {
