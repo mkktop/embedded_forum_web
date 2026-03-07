@@ -95,7 +95,13 @@ const loadUserInfo = async () => {
     document.title = `${userInfo.value.nickname || userInfo.value.username} - 用户主页 - 超次元论坛`
   } catch (error) {
     console.error('加载用户信息失败:', error)
-    ElMessage.error('加载用户信息失败')
+    if (error.response?.status === 403) {
+      ElMessage.error('无权限查看该用户信息')
+    } else if (error.response?.status === 404) {
+      ElMessage.error('用户不存在')
+    } else {
+      ElMessage.error('加载用户信息失败')
+    }
   } finally {
     loading.value = false
   }

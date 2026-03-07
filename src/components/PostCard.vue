@@ -27,16 +27,16 @@
     <div class="post-footer">
       <!-- 作者信息 -->
       <div class="author-info">
-        <router-link :to="`/user/${post.author_id}`" class="author-avatar-link" @click.prevent.stop>
+        <router-link :to="`/user/${post.user_id}`" class="author-avatar-link" @click.prevent.stop>
           <el-avatar :size="28" class="author-avatar">
             {{ post.author_name?.charAt(0) || 'U' }}
           </el-avatar>
         </router-link>
         <div class="author-detail">
-          <router-link :to="`/user/${post.author_id}`" class="author-name" @click.prevent.stop>
+          <router-link :to="`/user/${post.user_id}`" class="author-name" @click.prevent.stop>
             {{ post.author_nickname || post.author_name }}
           </router-link>
-          <span class="author-id">ID: {{ post.author_id }}</span>
+          <span class="author-id">ID: {{ post.user_id }}</span>
         </div>
         <span class="post-time">{{ formatTime(post.create_time) }}</span>
       </div>
