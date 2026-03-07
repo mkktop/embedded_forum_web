@@ -275,6 +275,34 @@ export const categoryApi = {
 }
 
 /**
+ * 用户公开信息API
+ * 包含：获取用户公开信息、用户帖子列表
+ */
+export const userPublicApi = {
+  /**
+   * 获取用户公开信息
+   * @param {number} id - 用户ID
+   * @returns {Promise<Object>} 用户公开信息
+   */
+  getInfo(id) {
+    return request.get(`/users/${id}`)
+  },
+
+  /**
+   * 获取用户帖子列表
+   * @param {number} id - 用户ID
+   * @param {Object} params - 查询参数
+   * @param {number} params.page - 页码
+   * @param {number} params.pageSize - 每页数量（最大50）
+   * @returns {Promise<Object>} 用户帖子列表
+   */
+  getPosts(id, params = {}) {
+    const query = new URLSearchParams(params).toString()
+    return request.get(`/users/${id}/posts${query ? `?${query}` : ''}`)
+  }
+}
+
+/**
  * 签到积分相关API
  * 包含：签到、签到状态、签到记录、积分信息、兑换邀请码
  */

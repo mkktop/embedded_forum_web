@@ -3,15 +3,20 @@
     <!-- 评论主体 -->
     <div class="comment-main">
       <!-- 用户头像 -->
-      <el-avatar :size="36" class="comment-avatar">
-        {{ comment.author_name?.charAt(0) || 'U' }}
-      </el-avatar>
+      <router-link :to="`/user/${comment.user_id}`" class="avatar-link">
+        <el-avatar :size="36" class="comment-avatar">
+          {{ comment.author_name?.charAt(0) || 'U' }}
+        </el-avatar>
+      </router-link>
       
       <!-- 评论内容 -->
       <div class="comment-content">
         <!-- 用户名和时间 -->
         <div class="comment-header">
-          <span class="comment-author">{{ comment.author_nickname || comment.author_name }}</span>
+          <router-link :to="`/user/${comment.user_id}`" class="comment-author">
+            {{ comment.author_nickname || comment.author_name }}
+          </router-link>
+          <span class="comment-user-id">ID: {{ comment.user_id }}</span>
           <span class="comment-time">{{ formatTime(comment.create_time) }}</span>
         </div>
         
@@ -47,12 +52,17 @@
           :key="reply.id"
           class="reply-item"
         >
-          <el-avatar :size="28" class="reply-avatar">
-            {{ reply.author_name?.charAt(0) || 'U' }}
-          </el-avatar>
+          <router-link :to="`/user/${reply.user_id}`" class="avatar-link">
+            <el-avatar :size="28" class="reply-avatar">
+              {{ reply.author_name?.charAt(0) || 'U' }}
+            </el-avatar>
+          </router-link>
           <div class="reply-content">
             <div class="reply-header">
-              <span class="reply-author">{{ reply.author_nickname || reply.author_name }}</span>
+              <router-link :to="`/user/${reply.user_id}`" class="reply-author">
+                {{ reply.author_nickname || reply.author_name }}
+              </router-link>
+              <span class="reply-user-id">ID: {{ reply.user_id }}</span>
               <span v-if="reply.reply_to_user_name" class="reply-to">
                 回复 <span class="reply-target">@{{ reply.reply_to_user_name }}</span>
               </span>
@@ -213,9 +223,19 @@ const loadReplies = async () => {
   gap: 12px;
 }
 
+.avatar-link {
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
 .comment-avatar {
   background: linear-gradient(135deg, #ff6b9d, #c44eff);
-  flex-shrink: 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
 }
 
 .comment-content {
@@ -228,12 +248,24 @@ const loadReplies = async () => {
   align-items: center;
   gap: 12px;
   margin-bottom: 8px;
+  flex-wrap: wrap;
 }
 
 .comment-author {
   color: #fff;
   font-size: 14px;
   font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #ff6b9d;
+  }
+}
+
+.comment-user-id {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
 }
 
 .comment-time {
@@ -327,7 +359,12 @@ const loadReplies = async () => {
 
 .reply-avatar {
   background: linear-gradient(135deg, #00d4ff, #c44eff);
-  flex-shrink: 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
 }
 
 .reply-content {
@@ -347,6 +384,17 @@ const loadReplies = async () => {
   color: #fff;
   font-size: 13px;
   font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #ff6b9d;
+  }
+}
+
+.reply-user-id {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
 }
 
 .reply-to {
