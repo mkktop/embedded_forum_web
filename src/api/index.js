@@ -645,3 +645,20 @@ export const systemApi = {
     return request.get('/system/info')
   }
 }
+
+/**
+ * AI聊天相关API
+ * 包含：AI对话接口
+ */
+export const aiApi = {
+  /**
+   * 与AI助手聊天
+   * @param {Object} data - 聊天数据
+   * @param {string} data.message - 用户消息内容
+   * @param {Array} [data.history] - 历史对话记录
+   * @returns {Promise<Object>} AI回复内容
+   */
+  chat(data) {
+    return request.post('/api/ai/chat', data)
+  }
+}

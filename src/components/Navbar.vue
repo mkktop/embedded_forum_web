@@ -32,6 +32,10 @@
           <el-icon><Calendar /></el-icon>
           <span>签到</span>
         </router-link>
+        <router-link v-if="userStore.isAdmin" to="/ai/chat" class="menu-item" active-class="active">
+          <el-icon><ChatLineSquare /></el-icon>
+          <span>AI聊天</span>
+        </router-link>
       </nav>
 
       <!-- 用户区域 -->
@@ -113,7 +117,8 @@ import {
   Document,
   Star,
   Setting,
-  SwitchButton
+  SwitchButton,
+  ChatLineSquare
 } from '@element-plus/icons-vue'
 
 // ==================== 状态定义 ====================
