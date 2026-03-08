@@ -659,6 +659,6 @@ export const aiApi = {
    * @returns {Promise<Object>} AI回复内容
    */
   chat(data) {
-    return request.post('/api/ai/chat', data)
+    return request.post('/ai/chat', data)
   }
 }
