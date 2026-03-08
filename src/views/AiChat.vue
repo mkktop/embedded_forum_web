@@ -288,7 +288,7 @@ watch(messages, () => {
 
 <style lang="scss" scoped>
 .ai-chat-page {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 24px;
 
@@ -349,7 +349,7 @@ watch(messages, () => {
   .chat-window {
     display: flex;
     flex-direction: column;
-    height: 700px;
+    height: 800px;
 
     .chat-header {
       display: flex;
